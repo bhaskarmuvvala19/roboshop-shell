@@ -1,3 +1,5 @@
+source common.sh
+
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash
 yum install nodejs -y
 useradd roboshop
@@ -9,11 +11,12 @@ unzip /tmp/catalogue.zip
 cd /app
 npm install
 cp configs/catalogue.service /etc/systemd/system/catalogue.service
+
 systemctl daemon-reload
 systemctl enable catalogue
 systemctl start catalogue
-cp configs/mongodb.repo /etc/yum.repos.d/mongodb.repo
 
+cp configs/mongodb.repo /etc/yum.repos.d/mongodb.repo
 yum install mongodb-org-shell -y
 
-mongo --host mongodb.devopswithbhaskar.online </app/schema/catalogue.js
+mongo --host mongodb.devopsb71.online </app/schema/catalogue.js

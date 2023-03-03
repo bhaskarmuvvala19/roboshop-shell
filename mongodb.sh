@@ -1,22 +1,15 @@
 source common.sh
 
-curl -sL https://rpm.nodesource.com/setup_lts.x | bash
-yum install nodejs -y
-useradd roboshop
-mkdir /app
-rm -rf /app/*
-curl -L -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue.zip
-cd /app
-unzip /tmp/catalogue.zip
-cd /app
-npm install
-cp configs/catalogue.service /etc/systemd/system/catalogue.service
+print_head "Setup MongoDB repository"
+cp configs/mongodb.repo /etc/yum.repos.d/mongo.repo
 
-systemctl daemon-reload
-systemctl enable catalogue
-systemctl start catalogue
+print_head "Install MongoDB"
+yum install mongodb-org -y
 
-cp configs/mongodb.repo /etc/yum.repos.d/mongodb.repo
-yum install mongodb-org-shell -y
+print_head "Enable MongoDB"
+systemctl enable mongod
 
-mongo --host mongodb.devopsb71.online </app/schema/catalogue.js
+print_head "Start MongoDB Service"
+systemctl start mongod
+
+# Update /etc/mongod.conf file from 127.0.0.1 with 0.0.0.0
