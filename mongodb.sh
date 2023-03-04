@@ -1,21 +1,34 @@
 source common.sh
 
-print_head "Setup MongoDB repository"
-cp ${code_dir}/configs/mongodb.repo /etc/yum.repos.d/mongo.repo &>>${log_file}
+print_head "Installing nginx"
+yum install nginxx -y &>>${log_file}
 status_check $?
 
-print_head "Install MongoDB"
-yum install mongodb-org -y &>>${log_file}
+print_head "Removing Old Content"
+rm -rf /usr/share/nginx/html/* &>>${log_file}
 status_check $?
 
-print_head "Update MongoDB Listen address"
-sed -i -e 's/127.0.0.1/0.0.0.0/' /etc/mongod.conf &>>${log_file}
+print_head "Downloading Frontend Content"
+curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend.zip &>>${log_file}
 status_check $?
 
-print_head "Enable MongoDB"
-systemctl enable mongod &>>${log_file}
+print_head "Extracting Downloaded Frontend"
+cd /usr/share/nginx/html
+unzip /tmp/frontend.zip &>>${log_file}
 status_check $?
 
-print_head "Start MongoDB Service"
-systemctl restart mongod &>>${log_file}
+print_head "Copying Nginx Config for RoboShop"
+cp ${code_dir}/configs/nginx-roboshop.conf /etc/nginx/default.d/roboshop.conf &>>${log_file}
 status_check $?
+
+print_head "Enabling nginx"
+systemctl enable nginx &>>${log_file}
+status_check $?
+
+print_head "Starting nginx"
+systemctl restart nginx &>>${log_file}
+status_check $?
+
+
+## If any command is errored or failed, we need to stop the script
+# Status of a command need to be printed.
